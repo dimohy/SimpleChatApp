@@ -34,6 +34,8 @@ namespace SimpleChatApp
         [ObservableProperty]
         private string _messages = string.Empty;
 
+        private DateOnly _lastDate;
+
 
         private ChatClient? _client;
 
@@ -71,11 +73,17 @@ namespace SimpleChatApp
             }
             else if (packet is ChatHelloResponse response)
             {
-                // 처리 (생략함)
+                // 인증키 처리 (생략함)
             }
             else if (packet is ChatMessageEvent message)
             {
-                Messages += $"{message.Nickname}: {message.Message}\r\n";
+                if (_lastDate != DateOnly.FromDateTime(DateTime.Now))
+                {
+                    _lastDate = DateOnly.FromDateTime(DateTime.Now);
+                    Messages += $"[{_lastDate}]\r\n";
+                }
+
+                Messages += $"[{TimeOnly.FromDateTime(DateTime.Now)}, {message.Nickname}] {message.Message}\r\n";
             }
             
             _ = e.Client.ReceiveAsync();
